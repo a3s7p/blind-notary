@@ -14,8 +14,12 @@ export function FileUpload() {
   const handleFileUpload = async (file: File) => {
     console.log("File uploaded:", file);
     setHasFile(true);
+
     const res = await toVault(file.name, await file.bytes());
-    console.log(res);
+    if (!res.ok) {
+      // TODO toast
+      console.log("Error while uploading file:", res.message);
+    }
   };
 
   const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
