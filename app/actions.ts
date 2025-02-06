@@ -28,24 +28,22 @@ function* chunks(arr: Uint8Array, n: number): Generator<Uint8Array, void> {
 
 const CHUNK_SIZE = 3064;
 
-export const toVault: (name: string, data: Uint8Array) => Result<void> = async (
-  name,
-  data,
-) => {
+export const toVault: (
+  name: string,
+  data: Uint8Array,
+) => Result<string> = async (name, data) => {
   try {
     const newSchemaId = (await ORG.createSchema(schema, name))[0].result.data;
-    console.log("New schema:", newSchemaId);
     ORG.setSchemaId(newSchemaId);
 
-    const dataWritten = await ORG.writeToNodes([
+    await ORG.writeToNodes([
       ...chunks(data, CHUNK_SIZE).map((chunk, i) => ({
         idx: i,
         data: { $allot: Buffer.from(chunk).toString("base64url") },
       })),
     ]);
 
-    console.log("Data written to nodes:", JSON.stringify(dataWritten, null, 2));
-    return { ok: true, value: undefined };
+    return { ok: true, value: newSchemaId };
   } catch (error) {
     return { ok: false, message: `Server error: failed to write: ${error}` };
   }
