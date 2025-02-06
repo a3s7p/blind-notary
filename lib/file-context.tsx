@@ -4,22 +4,20 @@ import React from "react";
 import { createContext, useState, useContext } from "react";
 
 interface FileContextType {
-  hasFile: boolean;
-  setHasFile: (hasFile: boolean) => void;
-  fileData: string;
-  setFileData: (data: string) => void;
+  fileId: string;
+  setFileId: (id: string) => void;
+  fileData: Uint8Array | null;
+  setFileData: (data: Uint8Array) => void;
 }
 
 const FileContext = createContext<FileContextType | undefined>(undefined);
 
 export function FileProvider({ children }: { children: React.ReactNode }) {
-  const [hasFile, setHasFile] = useState(false);
-  const [fileData, setFileData] = useState("");
+  const [fileId, setFileId] = useState("");
+  const [fileData, setFileData] = useState<Uint8Array | null>(null);
 
   return (
-    <FileContext.Provider
-      value={{ hasFile, setHasFile, fileData, setFileData }}
-    >
+    <FileContext.Provider value={{ fileId, setFileId, fileData, setFileData }}>
       {children}
     </FileContext.Provider>
   );

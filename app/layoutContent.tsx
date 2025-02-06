@@ -6,13 +6,13 @@ import { useFile } from "@/lib/file-context";
 import { ReactNode } from "react";
 
 export function LayoutContent({ children }: { children: ReactNode }) {
-  const { hasFile } = useFile();
+  const { fileId } = useFile();
 
   return (
     <div className="flex h-svh w-full">
-      {hasFile && <LeftSidebar />}
+      {fileId && <LeftSidebar />}
       <main className="flex-1 overflow-auto">{children}</main>
-      {hasFile && <AppSidebar />}
+      {fileId && <AppSidebar />}
     </div>
   );
 }
