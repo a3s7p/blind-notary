@@ -14,6 +14,7 @@ import {
 import { AutoResizeTextarea } from "@/components/autoresize-textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import type React from "react";
+import { MarkdownMessage } from "@/app/markdownMessage";
 
 export function ChatForm({
   className,
@@ -55,13 +56,11 @@ export function ChatForm({
         can I assist you today?
       </div>
       {messages.map((message, index) => (
-        <div
+        <MarkdownMessage
           key={index}
-          data-role={message.role}
-          className="max-w-[90%] rounded-xl px-3 py-2 text-sm data-[role=assistant]:self-start data-[role=user]:self-end data-[role=assistant]:bg-gray-100 data-[role=user]:bg-blue-500 data-[role=assistant]:text-black data-[role=user]:text-white"
-        >
-          {message.content}
-        </div>
+          content={message.content}
+          role={message.role}
+        />
       ))}
     </div>
   );
