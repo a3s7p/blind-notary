@@ -4,16 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { useState } from "react";
 import { useFile } from "@/lib/file-context";
+import { toVault } from "@/app/actions";
 
 export function FileUpload() {
   const [dragActive, setDragActive] = useState(false);
   const [fileUploaded, setFileUploaded] = useState(false);
-
   const { setHasFile } = useFile();
 
-  const handleFileUpload = (file: File) => {
+  const handleFileUpload = async (file: File) => {
     console.log("File uploaded:", file);
     setHasFile(true);
+    const res = await toVault(file.name, await file.bytes());
+    console.log(res);
   };
 
   const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {

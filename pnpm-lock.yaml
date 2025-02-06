@@ -135,8 +135,8 @@ importers:
         specifier: ^0.4.4
         version: 0.4.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       nillion-sv-wrappers:
-        specifier: ^1.0.7
-        version: 1.0.7
+        specifier: ^1.0.8
+        version: 1.0.8
       react:
         specifier: ^18
         version: 18.3.1
@@ -1694,8 +1694,8 @@ packages:
       sass:
         optional: true
 
-  nillion-sv-wrappers@1.0.7:
-    resolution: {integrity: sha512-US+dEZ8+cAloa3V2pZiTdMAYYZVQCXm4cH29GzAUYUkspYRF9v9nIJgzaThGhOVfLgOVg4oFs7AsB2a72JpDag==}
+  nillion-sv-wrappers@1.0.8:
+    resolution: {integrity: sha512-J+kg+9uoF/8JqSAE20CgHOzd3dIMYAFH49bLh/WmTdgmv3SrgYbiQz1M4ZqBJGGZwv5sjD3m9k7XnrQJoBnENA==}
 
   node-releases@2.0.19:
     resolution: {integrity: sha512-xxOWJsBKtzAq7DY0J+DTzuz58K8e7sJbdgwkbMWQe8UYB6ekmsQ45q0M/tJDsGaZmbC+l7n57UV8Hl5tHxO9uw==}
@@ -3785,7 +3785,7 @@ snapshots:
       - '@babel/core'
       - babel-plugin-macros
 
-  nillion-sv-wrappers@1.0.7:
+  nillion-sv-wrappers@1.0.8:
     dependencies:
       '@nillion/nilql': 0.0.0-alpha.9
       did-jwt: 8.0.8

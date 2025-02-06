@@ -10,16 +10,8 @@
         "format": "uuid",
         "coerce": true
       },
-      "name": {
-        "type": "object",
-        "properties": {
-          "$share": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "$share"
-        ]
+      "idx": {
+        "type": "integer"
       },
       "data": {
         "type": "object",
@@ -35,7 +27,7 @@
     },
     "required": [
       "_id",
-      "name",
+      "idx",
       "data"
     ]
   }
