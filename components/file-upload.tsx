@@ -3,10 +3,18 @@
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { useState } from "react";
+import { useFile } from "@/lib/file-context";
 
 export function FileUpload() {
   const [dragActive, setDragActive] = useState(false);
   const [fileUploaded, setFileUploaded] = useState(false);
+
+  const { setHasFile } = useFile();
+
+  const handleFileUpload = (file: File) => {
+    console.log("File uploaded:", file);
+    setHasFile(true);
+  };
 
   const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -25,6 +33,7 @@ export function FileUpload() {
     setDragActive(false);
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFileUpload(e.dataTransfer.files[0]);
       setFileUploaded(true);
     }
   };
@@ -32,6 +41,7 @@ export function FileUpload() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     if (e.target.files && e.target.files[0]) {
+      handleFileUpload(e.target.files[0]);
       setFileUploaded(true);
     }
   };
