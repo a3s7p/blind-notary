@@ -48,10 +48,11 @@ export const toVault: (name: string, data: Uint8Array) => Result<void> = async (
 
 export const fromVault: (name: string) => Result<Uint8Array> = async (name) => {
   try {
+    // TODO join from N parts on 16M size boundary
     const decryptedCollectionData = await DOCS.readFromNodes({ name });
     console.log(`Records under ${name}:`);
     decryptedCollectionData.forEach((v: any) => console.log(v));
-    return { ok: true, value: decryptedCollectionData[0] };
+    return { ok: true, value: fromBase64(decryptedCollectionData[0]) };
   } catch (error) {
     return { ok: false, message: `Server error: failed to upload: ${error}` };
   }
