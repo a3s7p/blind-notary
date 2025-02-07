@@ -7,11 +7,11 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 export function LeftSidebar() {
   return (
-    <Sidebar side="left" className="w-[250px]">
+    <Sidebar side="left" className="w-[15%]">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Table of Contents</SidebarGroupLabel>
@@ -43,6 +43,5 @@ export function LeftSidebar() {
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
-  )
+  );
 }
-

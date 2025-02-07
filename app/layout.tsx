@@ -3,7 +3,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Inter } from "next/font/google";
 import type { ReactNode } from "react";
-import { LayoutContent } from "./layoutContent";
 import { FileProvider } from "@/lib/file-context";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -22,7 +21,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         <TooltipProvider delayDuration={0}>
           <SidebarProvider>
             <FileProvider>
-              <LayoutContent>{children}</LayoutContent>
+              <div className="flex h-svh w-full">{children}</div>
             </FileProvider>
           </SidebarProvider>
         </TooltipProvider>
