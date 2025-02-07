@@ -4,21 +4,34 @@ import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { useState } from "react";
 import { useFile } from "@/lib/file-context";
-import { toVault } from "@/app/actions";
+import { fromVault, toVault } from "@/app/actions";
 
 export function FileUpload() {
-  const { fileId, setFileId } = useFile();
+  const { setFileId, setFileData } = useFile();
   const [dragActive, setDragActive] = useState(false);
 
   const handleFileUpload = async (file: File) => {
-    const res = await toVault(file.name, await file.bytes());
-    if (!res.ok) {
-      // TODO toast
-      console.log("Error while uploading file:", res.message);
-      return;
-    }
+    // TODO enable this
+    // const res = await toVault(file.name, await file.bytes());
+    // if (!res.ok) {
+    //   // TODO toast
+    //   console.log("Error while uploading file:", res.message);
+    //   return;
+    // }
 
-    setFileId(res.value);
+    // setFileId(res.value);
+    // // TODO optimize
+    // const newFile = await fromVault(res.value);
+
+    // if (!newFile.ok) {
+    //   // TODO toast
+    //   console.log("Error while downloading file:", newFile.message);
+    //   return;
+    // }
+
+    // setFileData(newFile.value);
+    setFileId("dummy");
+    setFileData(await file.bytes());
   };
 
   const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
@@ -49,7 +62,7 @@ export function FileUpload() {
     }
   };
 
-  return fileId ? null : (
+  return (
     <div className="flex flex-col h-full justify-evenly">
       <div className="text-center my-auto">
         <h1 className="text-4xl font-bold text-black tracking-tight">
