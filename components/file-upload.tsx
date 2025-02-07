@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { useState } from "react";
 import { useFile } from "@/lib/file-context";
-import { fromVault, toVault } from "@/app/actions";
+// import { fromVault, toVault } from "@/app/actions";
 
 export function FileUpload() {
   const { setFileId, setFileData } = useFile();
@@ -31,7 +31,7 @@ export function FileUpload() {
 
     // setFileData(newFile.value);
     setFileId("dummy");
-    setFileData(await file.bytes());
+    setFileData(file);
   };
 
   const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {

@@ -6,15 +6,15 @@ import { createContext, useState, useContext } from "react";
 interface FileContextType {
   fileId: string;
   setFileId: (id: string) => void;
-  fileData: Uint8Array | null;
-  setFileData: (data: Uint8Array) => void;
+  fileData: Blob | null;
+  setFileData: (data: Blob) => void;
 }
 
 const FileContext = createContext<FileContextType | undefined>(undefined);
 
 export function FileProvider({ children }: { children: React.ReactNode }) {
   const [fileId, setFileId] = useState("");
-  const [fileData, setFileData] = useState<Uint8Array | null>(null);
+  const [fileData, setFileData] = useState<Blob | null>(null);
 
   return (
     <FileContext.Provider value={{ fileId, setFileId, fileData, setFileData }}>
