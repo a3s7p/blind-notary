@@ -1,6 +1,7 @@
 import { LangChainAdapter, Message, CreateMessage } from "ai";
 import {
   AIMessage,
+  BaseMessageChunk,
   ChatMessage,
   HumanMessage,
   isAIMessageChunk,
@@ -23,8 +24,14 @@ export async function POST(req: Request) {
   try {
     console.log("API chat route called");
 
-    const body = await req.json();
-    const messages: Messages = (body.messages ?? [])
+    const { messages }: { messages: Message[] } = await req.json();
+
+    console.log(
+      "Received messages from client:",
+      JSON.stringify(messages, null, 2),
+    );
+
+    const lcMessages: Messages = messages
       .filter((v: Message) => v.role == "user" || v.role == "assistant")
       .map((v: Message) =>
         v.role == "user"
@@ -35,14 +42,14 @@ export async function POST(req: Request) {
       );
 
     console.log(
-      "Received messages from client:",
-      JSON.stringify(messages, null, 2),
+      "Converted to LC messages:",
+      JSON.stringify(lcMessages, null, 2),
     );
 
     const stream = await (
       await AGENT()
     ).stream(
-      { messages },
+      { messages: lcMessages },
       {
         configurable: { thread_id: "Blind Notary Demo Chat" },
         streamMode: "messages",
@@ -55,7 +62,8 @@ export async function POST(req: Request) {
     const transformStream = new ReadableStream<CreateMessage>({
       async start(controller) {
         for await (const chunk of stream) {
-          const [msgchunk, meta] = chunk;
+          const msgchunk: BaseMessageChunk = chunk[0];
+          // chunk[1] is LC metadata
 
           if ("content" in msgchunk && isAIMessageChunk(msgchunk)) {
             controller.enqueue({
