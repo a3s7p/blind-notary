@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { Inter } from "next/font/google";
 import type { ReactNode } from "react";
 import "./globals.css";
@@ -18,9 +17,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       <body
         className={cn("flex min-h-svh flex-col antialiased", inter.className)}
       >
-        <TooltipProvider delayDuration={0}>
-          <div className="flex h-svh w-full">{children}</div>
-        </TooltipProvider>
+        <div className="flex h-svh w-full">{children}</div>
       </body>
     </html>
   );

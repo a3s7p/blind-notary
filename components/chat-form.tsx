@@ -1,9 +1,8 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { useChat } from "ai/react";
 import { useEffect } from "react";
-import { ArrowUpIcon, AlertTriangle } from "lucide-react";
+import { ArrowUpIcon, AlertTriangle, FileIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -16,13 +15,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import type React from "react";
 import { MarkdownMessage } from "@/app/markdownMessage";
 
-export function ChatForm({
-  className,
-  ...props
-}: React.ComponentProps<"form">) {
-  const { messages, input, setInput, append, error } = useChat({
-    api: "/api/chat",
-  });
+export function ChatForm() {
+  const { messages, input, setInput, append, error } = useChat();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -67,7 +61,7 @@ export function ChatForm({
   }, [error]);
 
   return (
-    <TooltipProvider>
+    <TooltipProvider delayDuration={0}>
       <div className="flex h-full flex-col w-full md:w-3/4">
         <div className="flex-1 overflow-y-auto p-4">
           <Alert variant="destructive" className="mb-4">
@@ -82,8 +76,7 @@ export function ChatForm({
         </div>
         <form
           onSubmit={handleSubmit}
-          className="border-input bg-background focus-within:ring-ring/10 relative m-4 flex items-center rounded-[16px] border px-3 py-1.5 pr-8 text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-0"
-          {...props}
+          className="border-input bg-background focus-within:ring-ring/10 relative m-4 flex items-center rounded-[16px] border px-3 py-1.5 text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-0"
         >
           <AutoResizeTextarea
             onKeyDown={handleKeyDown}
@@ -92,17 +85,27 @@ export function ChatForm({
             placeholder="Enter a message"
             className="placeholder:text-muted-foreground flex-1 bg-transparent focus:outline-none"
           />
+
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
                 variant="ghost"
                 size="sm"
-                className="absolute bottom-1 right-1 size-6 rounded-full"
+                className="size-6 rounded-full mr-1"
               >
+                <FileIcon size={16} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent sideOffset={12}>Upload PDF</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="sm" className="size-6 rounded-full">
                 <ArrowUpIcon size={16} />
               </Button>
             </TooltipTrigger>
-            <TooltipContent sideOffset={12}>Submit</TooltipContent>
+            <TooltipContent sideOffset={12}>Send Message</TooltipContent>
           </Tooltip>
         </form>
       </div>
