@@ -3,7 +3,6 @@ import type { Config } from "tailwindcss";
 const config: Config = {
   darkMode: ["class"],
   content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "*.{js,ts,jsx,tsx,mdx}",
@@ -95,68 +94,6 @@ const config: Config = {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-      },
-
-      typography: {
-        DEFAULT: {
-          css: {
-            maxWidth: "none",
-            color: "inherit",
-            a: {
-              color: "inherit",
-              textDecoration: "underline",
-              fontWeight: "500",
-            },
-            '[class~="lead"]': {
-              color: "inherit",
-            },
-            strong: {
-              color: "inherit",
-            },
-            "ul > li::before": {
-              backgroundColor: "currentColor",
-            },
-            hr: {
-              borderColor: "currentColor",
-            },
-            blockquote: {
-              color: "inherit",
-              borderLeftColor: "currentColor",
-            },
-            h1: {
-              color: "inherit",
-            },
-            h2: {
-              color: "inherit",
-            },
-            h3: {
-              color: "inherit",
-            },
-            h4: {
-              color: "inherit",
-            },
-            "figure figcaption": {
-              color: "inherit",
-            },
-            code: {
-              color: "inherit",
-            },
-            "a code": {
-              color: "inherit",
-            },
-            pre: {
-              color: "var(--tw-prose-pre-code)",
-              backgroundColor: "var(--tw-prose-pre-bg)",
-            },
-            thead: {
-              color: "inherit",
-              borderBottomColor: "currentColor",
-            },
-            "tbody tr": {
-              borderBottomColor: "currentColor",
-            },
-          },
-        },
       },
     },
     plugins: [
