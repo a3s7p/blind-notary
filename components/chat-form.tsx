@@ -46,8 +46,8 @@ export function ChatForm({
   const messageList = (
     <div className="my-4 flex h-fit min-h-full flex-col gap-4">
       <div className="max-w-[90%] rounded-xl px-3 py-2 text-sm self-start bg-gray-100 text-black">
-        Welcome to Blind Notary! I'm your AI assistant for document review. How
-        can I assist you today?
+        Welcome! I'm Blind Notary, your AI assistant for document signing and
+        review. What can I help you with?
       </div>
       {messages.map((message, index) => (
         <MarkdownMessage
@@ -59,6 +59,7 @@ export function ChatForm({
     </div>
   );
 
+  // TODO toast
   useEffect(() => {
     if (error) {
       console.error("Chat error:", error);
@@ -67,7 +68,7 @@ export function ChatForm({
 
   return (
     <TooltipProvider>
-      <div className={cn("flex h-full flex-col", className)}>
+      <div className="flex h-full flex-col w-full md:w-3/4">
         <div className="flex-1 overflow-y-auto p-4">
           <Alert variant="destructive" className="mb-4">
             <AlertTriangle className="h-4 w-4" />
@@ -76,11 +77,7 @@ export function ChatForm({
               advice.
             </AlertDescription>
           </Alert>
-          {error && (
-            <div className="mb-4 rounded-md bg-red-50 p-4 text-sm text-red-500">
-              Error: {error.message}
-            </div>
-          )}
+
           {messageList}
         </div>
         <form
