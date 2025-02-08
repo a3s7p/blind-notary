@@ -73,7 +73,7 @@ export function ChatForm({
 
   return (
     <TooltipProvider>
-      <div className={cn("flex h-full flex-col", className)} {...props}>
+      <div className={cn("flex h-full flex-col", className)}>
         <div className="flex-1 overflow-y-auto p-4">
           {disclaimer}
           {error && (
@@ -86,6 +86,7 @@ export function ChatForm({
         <form
           onSubmit={handleSubmit}
           className="border-input bg-background focus-within:ring-ring/10 relative m-4 flex items-center rounded-[16px] border px-3 py-1.5 pr-8 text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-0"
+          {...props}
         >
           <AutoResizeTextarea
             onKeyDown={handleKeyDown}
