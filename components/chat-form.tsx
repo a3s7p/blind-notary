@@ -1,7 +1,7 @@
 "use client";
 
 import { useChat } from "ai/react";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowUpIcon, AlertTriangle, FileIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,33 +16,57 @@ import type React from "react";
 import { MarkdownMessage } from "@/app/markdownMessage";
 
 export function ChatForm() {
-  const { messages, input, setInput, append, error } = useChat();
+  const { messages, input, setInput, error, handleSubmit } = useChat({
+    initialMessages: [], // TODO load history
+    onToolCall({ toolCall }) {
+      console.log("tool called on client", toolCall);
+    },
+  });
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  // file uploads
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [files, setFiles] = useState<FileList | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFiles(e.target.files);
+  };
+
+  // send something to agent
+
+  const handleSubmitWrapper = (
+    e:
+      | React.ChangeEvent<HTMLInputElement>
+      | React.KeyboardEvent<HTMLTextAreaElement>
+      | React.FormEvent<HTMLFormElement>,
+  ) => {
     e.preventDefault();
-
     console.log("Submitting message:", input);
 
-    void append({ content: input, role: "user" })
-      .then(() => console.log("Message appended successfully"))
-      .catch((err) => console.error("Error appending message:", err));
+    handleSubmit(e, {
+      experimental_attachments: files || undefined,
+      allowEmptySubmit: false,
+    });
 
-    setInput("");
+    setFiles(null);
   };
+
+  // send message
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>);
+      handleSubmitWrapper(e);
     }
   };
+
+  // send file
 
   const messageList = (
     <div className="my-4 flex h-fit min-h-full flex-col gap-4">
       <MarkdownMessage
+        role="assistant"
         content="Welcome! I'm Blind Notary, your AI assistant for document signing and
         review. What can I help you with?"
-        role="assistant"
       />
 
       {messages.map((message, index) => (
@@ -77,23 +101,30 @@ export function ChatForm() {
           {messageList}
         </div>
         <form
-          onSubmit={handleSubmit}
+          onSubmit={handleSubmitWrapper}
           className="border-input bg-background focus-within:ring-ring/10 relative m-4 flex items-center rounded-[16px] border px-3 py-1.5 text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-0"
         >
           <AutoResizeTextarea
             onKeyDown={handleKeyDown}
-            onChange={(v) => setInput(v)}
+            onChange={(e) => setInput(e.target.value)}
             value={input}
             placeholder="Enter a message"
             className="placeholder:text-muted-foreground flex-1 bg-transparent focus:outline-none"
           />
-
+          <input
+            type="file"
+            accept=".pdf"
+            onChange={handleFileChange}
+            ref={fileInputRef}
+            className="hidden"
+          />
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
                 variant="ghost"
                 size="sm"
                 className="size-6 rounded-full mr-1"
+                onClick={() => fileInputRef.current?.click()}
               >
                 <FileIcon size={16} />
               </Button>

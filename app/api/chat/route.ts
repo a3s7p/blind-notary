@@ -1,11 +1,14 @@
-import { LangChainAdapter, Message } from "ai";
+import { LangChainAdapter, Message, CreateMessage } from "ai";
 import {
   AIMessage,
+  ChatMessage,
   HumanMessage,
   isAIMessageChunk,
+  isToolMessageChunk,
 } from "@langchain/core/messages";
 import { initAgent } from "./initAgent";
 import { validateEnvironment } from "./validateEnvironment";
+import { Messages } from "@langchain/langgraph";
 
 // Right after imports and before any other code
 validateEnvironment();
@@ -20,7 +23,16 @@ export async function POST(req: Request) {
   try {
     console.log("API chat route called");
 
-    const { messages }: { messages: Message[] } = await req.json();
+    const body = await req.json();
+    const messages: Messages = (body.messages ?? [])
+      .filter((v: Message) => v.role == "user" || v.role == "assistant")
+      .map((v: Message) =>
+        v.role == "user"
+          ? new HumanMessage(v.content)
+          : v.role == "assistant"
+            ? new AIMessage(v.content)
+            : new ChatMessage(v.content, v.role),
+      );
 
     console.log(
       "Received messages from client:",
@@ -30,13 +42,7 @@ export async function POST(req: Request) {
     const stream = await (
       await AGENT()
     ).stream(
-      {
-        messages: messages.map((message) =>
-          message.role == "user"
-            ? new HumanMessage(message.content)
-            : new AIMessage(message.content),
-        ),
-      },
+      { messages },
       {
         configurable: { thread_id: "Blind Notary Demo Chat" },
         streamMode: "messages",
@@ -46,16 +52,46 @@ export async function POST(req: Request) {
     console.log("Stream created successfully");
 
     // Convert LangChain message chunks into AI SDK messages
-    const transformStream = new ReadableStream({
+    const transformStream = new ReadableStream<CreateMessage>({
       async start(controller) {
         for await (const chunk of stream) {
           const [msgchunk, meta] = chunk;
-          console.log("sending chunk:", msgchunk, meta);
 
-          if (isAIMessageChunk(msgchunk) && "content" in msgchunk) {
+          if ("content" in msgchunk && isAIMessageChunk(msgchunk)) {
             controller.enqueue({
-              content: msgchunk.content,
+              id: msgchunk.id,
+              content: msgchunk.content.toString(),
               role: "assistant",
+              parts: [
+                { type: "text", text: msgchunk.content.toString() },
+                ...(msgchunk.tool_calls?.map((v) => ({
+                  type: "tool-invocation" as const,
+                  toolInvocation: {
+                    state: "call" as const,
+                    toolCallId: v.id || "",
+                    toolName: v.name,
+                    args: v.args,
+                  },
+                })) || []),
+              ],
+            });
+          } else if (isToolMessageChunk(msgchunk)) {
+            controller.enqueue({
+              id: msgchunk.id,
+              content: "",
+              role: "assistant",
+              parts: [
+                {
+                  type: "tool-invocation" as const,
+                  toolInvocation: {
+                    state: "result" as const,
+                    toolCallId: msgchunk.tool_call_id,
+                    toolName: msgchunk.name || "",
+                    args: msgchunk.additional_kwargs,
+                    result: msgchunk.content.toString(),
+                  },
+                },
+              ],
             });
           }
         }
