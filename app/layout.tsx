@@ -4,6 +4,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { Inter } from "next/font/google";
 import type { ReactNode } from "react";
 import { FileProvider } from "@/lib/file-context";
+import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,5 +30,3 @@ export default function Layout({ children }: { children: ReactNode }) {
     </html>
   );
 }
-
-import "./globals.css";

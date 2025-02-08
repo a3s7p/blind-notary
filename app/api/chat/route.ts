@@ -14,15 +14,11 @@ import {
 } from "@coinbase/agentkit";
 import {
   AIMessage,
-  BaseMessage,
-  BaseMessageChunk,
   HumanMessage,
   isAIMessageChunk,
-  isHumanMessageChunk,
-  isToolMessageChunk,
 } from "@langchain/core/messages";
 import { MemorySaver } from "@langchain/langgraph";
-import { StringOutputParser } from "@langchain/core/output_parsers";
+
 import * as fs from "fs";
 
 /**
@@ -172,7 +168,10 @@ export async function POST(req: Request) {
   try {
     console.log("API route called");
     const { messages }: { messages: Message[] } = await req.json();
-    console.log("Received messages:", JSON.stringify(messages, null, 2));
+    console.log(
+      "Received messages from client:",
+      JSON.stringify(messages, null, 2),
+    );
 
     if (!process.env.OPENAI_API_KEY) {
       throw new Error("OPENAI_API_KEY is not set");

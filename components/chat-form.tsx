@@ -26,10 +26,13 @@ export function ChatForm({
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     console.log("Submitting message:", input);
+
     void append({ content: input, role: "user" })
       .then(() => console.log("Message appended successfully"))
       .catch((err) => console.error("Error appending message:", err));
+
     setInput("");
   };
 
@@ -39,15 +42,6 @@ export function ChatForm({
       handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>);
     }
   };
-
-  const disclaimer = (
-    <Alert variant="destructive" className="mb-4">
-      <AlertTriangle className="h-4 w-4" />
-      <AlertDescription>
-        This AI assistant is not a substitute for professional legal advice.
-      </AlertDescription>
-    </Alert>
-  );
 
   const messageList = (
     <div className="my-4 flex h-fit min-h-full flex-col gap-4">
@@ -75,7 +69,13 @@ export function ChatForm({
     <TooltipProvider>
       <div className={cn("flex h-full flex-col", className)}>
         <div className="flex-1 overflow-y-auto p-4">
-          {disclaimer}
+          <Alert variant="destructive" className="mb-4">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              This AI assistant is not a substitute for professional legal
+              advice.
+            </AlertDescription>
+          </Alert>
           {error && (
             <div className="mb-4 rounded-md bg-red-50 p-4 text-sm text-red-500">
               Error: {error.message}
