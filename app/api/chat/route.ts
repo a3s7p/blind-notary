@@ -18,7 +18,6 @@ import {
   isAIMessageChunk,
 } from "@langchain/core/messages";
 import { MemorySaver } from "@langchain/langgraph";
-
 import * as fs from "fs";
 
 /**
@@ -36,6 +35,7 @@ function validateEnvironment(): void {
     "CDP_API_KEY_NAME",
     "CDP_API_KEY_PRIVATE_KEY",
   ];
+
   requiredVars.forEach((varName) => {
     if (!process.env[varName]) {
       missingVars.push(varName);
@@ -45,9 +45,11 @@ function validateEnvironment(): void {
   // Exit if any required variables are missing
   if (missingVars.length > 0) {
     console.error("Error: Required environment variables are not set");
+
     missingVars.forEach((varName) => {
       console.error(`${varName}=your_${varName.toLowerCase()}_here`);
     });
+
     process.exit(1);
   }
 
@@ -152,6 +154,8 @@ async function initializeAgent() {
         restating your tools' descriptions unless it is explicitly requested.
         `,
     });
+
+    console.log("Available tools:", tools);
 
     // Save wallet data
     const exportedWallet = await walletProvider.exportWallet();
