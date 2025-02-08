@@ -10,7 +10,7 @@ export function MarkdownMessage({ content, role }: MarkdownMessageProps) {
   return (
     <div
       data-role={role}
-      className="max-w-[90%] rounded-xl px-3 py-2 text-sm data-[role=assistant]:self-start data-[role=user]:self-end data-[role=assistant]:bg-gray-100 data-[role=user]:bg-blue-500 data-[role=assistant]:text-black data-[role=user]:text-white"
+      className="max-w-[90%] rounded-xl px-3 py-2 text-sm data-[role=assistant]:self-start data-[role=user]:self-end data-[role=assistant]:bg-secondary data-[role=user]:bg-primary data-[role=user]:text-secondary"
     >
       <ReactMarkdown
         className={cn(

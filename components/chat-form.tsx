@@ -39,10 +39,12 @@ export function ChatForm() {
 
   const messageList = (
     <div className="my-4 flex h-fit min-h-full flex-col gap-4">
-      <div className="max-w-[90%] rounded-xl px-3 py-2 text-sm self-start bg-gray-100 text-black">
-        Welcome! I'm Blind Notary, your AI assistant for document signing and
-        review. What can I help you with?
-      </div>
+      <MarkdownMessage
+        content="Welcome! I'm Blind Notary, your AI assistant for document signing and
+        review. What can I help you with?"
+        role="assistant"
+      />
+
       {messages.map((message, index) => (
         <MarkdownMessage
           key={index}
