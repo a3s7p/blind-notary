@@ -32,10 +32,12 @@ function* chunks(arr: Uint8Array, n: number): Generator<Uint8Array, void> {
 // approximate so it doesn't go over 4K after b64 encoding
 const MAX_CHUNK_SIZE = 3064;
 
+// just generates new session and party key
 export async function newChat() {
   redirect(`/chat/${randomUUID()}/${randomUUID()}`);
 }
 
+// obtain entire history for session/schema ID
 export async function getHistory(schemaId: string): Promise<Message[]> {
   try {
     ORG.setSchemaId(schemaId);
@@ -97,7 +99,7 @@ export async function getHistory(schemaId: string): Promise<Message[]> {
 //   }
 // };
 
-// reconstruct original object
+// reconstruct original object from chunks
 function assembleChunks(chunks: Chunk[]) {
   const buf = Buffer.alloc(chunks.reduce((acc, v) => acc + v.sz, 0));
 
@@ -111,7 +113,21 @@ function assembleChunks(chunks: Chunk[]) {
   return buf;
 }
 
-export async function appendObject(
+// the 4K limit currently gets in the way of preserving big JSON directly
+// b64 binary wastes a bit of space but is more reliable/universal
+export async function appendObjectJSON(
+  schemaId: string,
+  objectId: string,
+  data: any,
+) {
+  await appendObjectBinary(
+    schemaId,
+    objectId,
+    new TextEncoder().encode(JSON.stringify(data)),
+  );
+}
+
+export async function appendObjectBinary(
   schemaId: string,
   objectId: string,
   data: Uint8Array,

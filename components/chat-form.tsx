@@ -22,7 +22,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import type React from "react";
 import { MarkdownMessage } from "@/app/markdownMessage";
 import { Input } from "./ui/input";
-import { appendObject } from "@/app/actions";
+import { appendObjectJSON } from "@/app/actions";
 
 type ChatFormProps = {
   chatId: string;
@@ -38,12 +38,7 @@ export function ChatForm(props: ChatFormProps) {
     },
     onFinish(message) {
       setTimeout(
-        async () =>
-          await appendObject(
-            props.chatId,
-            message.id,
-            new TextEncoder().encode(JSON.stringify(message)),
-          ),
+        async () => await appendObjectJSON(props.chatId, message.id, message),
       );
     },
     experimental_prepareRequestBody(options) {

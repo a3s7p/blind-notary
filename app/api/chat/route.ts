@@ -5,7 +5,7 @@ import { AIMessage, ChatMessage, HumanMessage } from "@langchain/core/messages";
 import { initAgent } from "./initAgent";
 import { validateEnvironment } from "./validateEnvironment";
 import { Messages } from "@langchain/langgraph";
-import { appendObject } from "@/app/actions";
+import { appendObjectJSON } from "@/app/actions";
 
 // Right after imports and before any other code
 validateEnvironment();
@@ -27,13 +27,7 @@ export async function POST(req: Request) {
     // save last received message in nilDB for history
     const last = messages.at(-1);
 
-    last
-      ? await appendObject(
-          id,
-          last.id,
-          new TextEncoder().encode(JSON.stringify(last)),
-        )
-      : null;
+    last ? await appendObjectJSON(id, last.id, last) : null;
 
     for (const m of messages) {
       // load attachments into vector store
