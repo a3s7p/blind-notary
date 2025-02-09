@@ -8,10 +8,6 @@ import { randomUUID } from "crypto";
 import { redirect } from "next/navigation";
 import { Message } from "ai";
 
-type Result<R> = Promise<
-  { ok: true; value: R } | { ok: false; message: string }
->;
-
 type Chunk = {
   _id: string;
   object: string;

@@ -126,8 +126,6 @@ export function ChatForm(props: ChatFormProps) {
     }
   }, [error]);
 
-  const suggestions = ["Lorem", "ipsum", "dolorem"];
-
   return (
     <TooltipProvider delayDuration={0}>
       <div className="flex h-full flex-col w-full md:w-3/4">
@@ -203,16 +201,17 @@ export function ChatForm(props: ChatFormProps) {
         </form>
         <div className="mx-4 flex justify-between items-center rounded-[16px] text-sm">
           <div className="flex gap-3">
-            {suggestions.map((v) => (
-              <Button
-                key={v}
-                variant={"outline"}
-                size="sm"
-                className="rounded-full"
-              >
-                {v}
-              </Button>
-            ))}
+            <Button variant={"outline"} size="sm" className="rounded-full">
+              Sign
+            </Button>
+
+            <Button variant={"outline"} size="sm" className="rounded-full">
+              Seal
+            </Button>
+
+            <Button variant={"outline"} size="sm" className="rounded-full">
+              Certify
+            </Button>
           </div>
           <div className="flex items-center text-neutral-500 gap-2 hover:text-neutral-200 border rounded-full px-3 py-1.5">
             Chat ID: <b>{props.chatId}</b>

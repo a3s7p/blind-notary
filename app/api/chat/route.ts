@@ -1,14 +1,7 @@
-import { LangChainAdapter, Message, CreateMessage } from "ai";
+import { LangChainAdapter, Message } from "ai";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
-import {
-  AIMessage,
-  BaseMessageChunk,
-  ChatMessage,
-  HumanMessage,
-  isAIMessageChunk,
-  isToolMessageChunk,
-} from "@langchain/core/messages";
+import { AIMessage, ChatMessage, HumanMessage } from "@langchain/core/messages";
 import { initAgent } from "./initAgent";
 import { validateEnvironment } from "./validateEnvironment";
 import { Messages } from "@langchain/langgraph";
