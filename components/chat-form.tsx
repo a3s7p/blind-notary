@@ -8,7 +8,6 @@ import {
   FileCheckIcon,
   PaperclipIcon,
   FileIcon,
-  ClipboardCopyIcon,
   HandshakeIcon,
   SignatureIcon,
   StampIcon,
@@ -173,7 +172,10 @@ export function ChatForm(props: ChatFormProps) {
                   variant="destructive"
                   size="sm"
                   className="rounded-lg"
-                  onClick={() => setChatIdCopied(true)}
+                  onClick={() => {
+                    navigator.clipboard.writeText(location.href);
+                    setChatIdCopied(true);
+                  }}
                 >
                   {isChatIdCopied ? (
                     <>
@@ -187,7 +189,7 @@ export function ChatForm(props: ChatFormProps) {
                 </Button>
               </TooltipTrigger>
               <TooltipContent sideOffset={12} className="text-center">
-                Copy your unique link to clipboard
+                Copy your unique access link to clipboard
                 <br />
                 Do NOT share it.
               </TooltipContent>
