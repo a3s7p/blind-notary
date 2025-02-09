@@ -3,6 +3,8 @@
 import { SecretVaultWrapper } from "nillion-sv-wrappers";
 import { orgConfig } from "@/nillionOrgConfig.js";
 import schema from "@/schema.json" with { type: "json" };
+import { randomUUID } from "crypto";
+import { redirect } from "next/navigation";
 
 type Result<R> = Promise<
   { ok: true; value: R } | { ok: false; message: string }
@@ -27,6 +29,13 @@ function* chunks(arr: Uint8Array, n: number): Generator<Uint8Array, void> {
 }
 
 const CHUNK_SIZE = 3064;
+
+export async function newChat() {
+  const id = randomUUID();
+  const key = randomUUID();
+
+  redirect(`/chat/${id}/${key}`);
+}
 
 export const toVault: (
   name: string,

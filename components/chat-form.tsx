@@ -70,8 +70,7 @@ export function ChatForm() {
     <div className="my-4 flex h-fit min-h-full flex-col gap-4">
       <MarkdownMessage
         role="assistant"
-        content="Welcome! I'm Blind Notary, your AI assistant for document signing and
-        review. What can I help you with?"
+        content="Welcome! I'm Blind Notary. What can I help you with?"
       />
 
       {messages.map((message, index) => {
