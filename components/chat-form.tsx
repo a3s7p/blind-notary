@@ -9,6 +9,11 @@ import {
   PaperclipIcon,
   FileIcon,
   ClipboardCopyIcon,
+  HandshakeIcon,
+  SignatureIcon,
+  StampIcon,
+  LinkIcon,
+  CheckIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,7 +23,7 @@ import {
   TooltipProvider,
 } from "@/components/ui/tooltip";
 import { AutoResizeTextarea } from "@/components/autoresize-textarea";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import type React from "react";
 import { MarkdownMessage } from "@/app/markdownMessage";
 import { Input } from "./ui/input";
@@ -31,20 +36,21 @@ type ChatFormProps = {
 };
 
 export function ChatForm(props: ChatFormProps) {
-  const { messages, input, handleInputChange, error, handleSubmit } = useChat({
-    initialMessages: props.messages,
-    onToolCall({ toolCall }) {
-      console.log("tool called on client", toolCall);
-    },
-    onFinish(message) {
-      setTimeout(
-        async () => await appendObjectJSON(props.chatId, message.id, message),
-      );
-    },
-    experimental_prepareRequestBody(options) {
-      return { ...options, id: props.chatId, metadata: props };
-    },
-  });
+  const { messages, input, append, handleInputChange, error, handleSubmit } =
+    useChat({
+      initialMessages: props.messages,
+      onToolCall({ toolCall }) {
+        console.log("tool called on client", toolCall);
+      },
+      onFinish(message) {
+        setTimeout(
+          async () => await appendObjectJSON(props.chatId, message.id, message),
+        );
+      },
+      experimental_prepareRequestBody(options) {
+        return { ...options, id: props.chatId, metadata: props };
+      },
+    });
 
   // file uploads
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -121,19 +127,100 @@ export function ChatForm(props: ChatFormProps) {
     }
   }, [error]);
 
+  const commands = [
+    {
+      icon: <HandshakeIcon size={16} />,
+      name: "Invite",
+      desc: "Invite party to sign document together",
+    },
+    {
+      icon: <SignatureIcon size={16} />,
+      name: "Sign",
+      desc: "Provide your signature on this session",
+    },
+    {
+      icon: <StampIcon size={16} />,
+      name: "Seal",
+      desc: "Seal session and produce certificate",
+    },
+  ];
+
+  const [isChatIdCopied, setChatIdCopied] = useState(false);
+  useEffect(() => {
+    if (isChatIdCopied) {
+      setTimeout(() => setChatIdCopied(false), 2000);
+    }
+  }, [isChatIdCopied]);
+
   return (
     <TooltipProvider delayDuration={0}>
       <div className="flex h-full flex-col w-full md:w-3/4">
         <div className="flex-1 overflow-y-auto p-4">
-          <Alert variant="destructive">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertDescription>
-              This AI assistant is not a substitute for professional legal
-              advice.
-            </AlertDescription>
-          </Alert>
+          <div className="flex w-full justify-between items-center gap-5">
+            <Alert variant="destructive" className="w-3/4">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Please note</AlertTitle>
+              <AlertDescription>
+                This AI assistant is not a substitute for professional legal
+                advice.
+              </AlertDescription>
+            </Alert>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  className="rounded-lg"
+                  onClick={() => setChatIdCopied(true)}
+                >
+                  {isChatIdCopied ? (
+                    <>
+                      <CheckIcon size={16} /> Copied!
+                    </>
+                  ) : (
+                    <>
+                      <LinkIcon size={16} /> Copy private link
+                    </>
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent sideOffset={12} className="text-center">
+                Copy your unique link to clipboard
+                <br />
+                Do NOT share it.
+              </TooltipContent>
+            </Tooltip>
+          </div>
 
           {messageList}
+        </div>
+
+        <div className="mx-4 flex justify-between items-center rounded-[16px] text-sm">
+          <div className="flex w-full items-center justify-center gap-3">
+            {commands.map(({ icon, name, desc }) => (
+              <Tooltip key={name}>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-full"
+                    onClick={() => {
+                      append({
+                        role: "user",
+                        content: name,
+                      });
+                    }}
+                  >
+                    {icon}
+                    {name}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent sideOffset={12}>{desc}</TooltipContent>
+              </Tooltip>
+            ))}
+          </div>
         </div>
         <form
           id="msgForm"
@@ -160,6 +247,7 @@ export function ChatForm(props: ChatFormProps) {
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
+                type="button"
                 variant="ghost"
                 size="sm"
                 className="size-6 rounded-full mr-1"
@@ -194,25 +282,6 @@ export function ChatForm(props: ChatFormProps) {
             <TooltipContent sideOffset={12}>Send</TooltipContent>
           </Tooltip>
         </form>
-        <div className="mx-4 flex justify-between items-center rounded-[16px] text-sm">
-          <div className="flex gap-3">
-            <Button variant={"outline"} size="sm" className="rounded-full">
-              Sign
-            </Button>
-
-            <Button variant={"outline"} size="sm" className="rounded-full">
-              Seal
-            </Button>
-
-            <Button variant={"outline"} size="sm" className="rounded-full">
-              Certify
-            </Button>
-          </div>
-          <div className="flex items-center text-neutral-500 gap-2 hover:text-neutral-200 border rounded-full px-3 py-1.5">
-            Chat ID: <b>{props.chatId}</b>
-            <ClipboardCopyIcon size={16} />
-          </div>
-        </div>
       </div>
     </TooltipProvider>
   );
