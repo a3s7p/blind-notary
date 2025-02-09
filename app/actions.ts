@@ -32,6 +32,13 @@ function* chunks(arr: Uint8Array, n: number): Generator<Uint8Array, void> {
 // approximate so it doesn't go over 4K after b64 encoding
 const MAX_CHUNK_SIZE = 3064;
 
+export async function newExistingChatUrl(
+  chatId: string,
+  role: "author" | "signatory" | "reviewer",
+) {
+  return `https://blind-notary.vercel.app/chat/${chatId}/${role}/${randomUUID()}`;
+}
+
 export async function newChatUrl(role: "author" | "signatory" | "reviewer") {
   return `/chat/${randomUUID()}/${role}/${randomUUID()}`;
 }

@@ -7,7 +7,7 @@ import { initAgentKit } from "./initAgentKit";
 import { OpenAIEmbeddings } from "@langchain/openai";
 import { MemoryVectorStore } from "langchain/vectorstores/memory";
 import { DefaultProvider } from "@/app/ProviderConfig";
-import { newChat, newChatUrl } from "@/app/actions";
+import { newExistingChatUrl } from "@/app/actions";
 import { DynamicStructuredTool } from "@langchain/core/tools";
 
 // File with the system prompt
@@ -48,13 +48,19 @@ export async function initAgent() {
       name: "Invite",
       description: "Generate invite link for a counterparty to the document",
       schema: z.object({
+        chatId: z
+          .string()
+          .uuid()
+          .describe(
+            "The chat ID of the current chat. This will be supplied together with the Invite command.",
+          ),
         role: z
           .enum(["signatory", "reviewer"])
           .describe(
             "Whether the invited party should have read only (reviewer) or read & sign (signatory) access",
           ),
       }),
-      func: async ({ role }) => await newChatUrl(role),
+      func: async ({ chatId, role }) => await newExistingChatUrl(chatId, role),
     });
 
     const tools = [msearchTool, inviteTool, ...(await initAgentKit())];

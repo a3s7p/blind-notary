@@ -131,16 +131,19 @@ export function ChatForm(props: ChatFormProps) {
       icon: <HandshakeIcon size={16} />,
       name: "Invite",
       desc: "Invite party to sign document together",
+      send: `_<Invite to ${props.chatId}>_`,
     },
     {
       icon: <SignatureIcon size={16} />,
       name: "Sign",
       desc: "Provide your signature on this session",
+      send: "_<Sign session>_",
     },
     {
       icon: <StampIcon size={16} />,
       name: "Seal",
       desc: "Seal session and produce certificate",
+      send: "_<Seal>_",
     },
   ];
 
@@ -201,7 +204,7 @@ export function ChatForm(props: ChatFormProps) {
 
         <div className="mx-4 flex justify-between items-center rounded-[16px] text-sm">
           <div className="flex w-full items-center justify-center gap-3">
-            {commands.map(({ icon, name, desc }) => (
+            {commands.map(({ icon, name, desc, send }) => (
               <Tooltip key={name}>
                 <TooltipTrigger asChild>
                   <Button
@@ -211,7 +214,7 @@ export function ChatForm(props: ChatFormProps) {
                     onClick={() => {
                       append({
                         role: "user",
-                        content: name,
+                        content: send,
                       });
                     }}
                   >
