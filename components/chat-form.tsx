@@ -2,7 +2,13 @@
 
 import { useChat } from "ai/react";
 import { useEffect, useRef, useState } from "react";
-import { ArrowUpIcon, AlertTriangle, FileIcon } from "lucide-react";
+import {
+  ArrowUpIcon,
+  AlertTriangle,
+  FileCheckIcon,
+  PaperclipIcon,
+  FileIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -14,9 +20,10 @@ import { AutoResizeTextarea } from "@/components/autoresize-textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import type React from "react";
 import { MarkdownMessage } from "@/app/markdownMessage";
+import { Input } from "./ui/input";
 
 export function ChatForm() {
-  const { messages, input, setInput, error, handleSubmit } = useChat({
+  const { messages, input, handleInputChange, error, handleSubmit } = useChat({
     initialMessages: [], // TODO load history
     onToolCall({ toolCall }) {
       console.log("tool called on client", toolCall);
@@ -32,34 +39,32 @@ export function ChatForm() {
   };
 
   // send something to agent
-
   const handleSubmitWrapper = (
     e:
-      | React.ChangeEvent<HTMLInputElement>
       | React.KeyboardEvent<HTMLTextAreaElement>
       | React.FormEvent<HTMLFormElement>,
   ) => {
     e.preventDefault();
-    console.log("Submitting message:", input);
+    console.log("Submitting message:", input, files?.length);
 
     handleSubmit(e, {
       experimental_attachments: files || undefined,
-      allowEmptySubmit: false,
+      body: {
+        filename: files ? files[0].name : undefined,
+      },
+      allowEmptySubmit: true,
     });
 
     setFiles(null);
   };
 
-  // send message
-
+  // send message with enter
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmitWrapper(e);
     }
   };
-
-  // send file
 
   const messageList = (
     <div className="my-4 flex h-fit min-h-full flex-col gap-4">
@@ -69,13 +74,27 @@ export function ChatForm() {
         review. What can I help you with?"
       />
 
-      {messages.map((message, index) => (
-        <MarkdownMessage
-          key={index}
-          content={message.content}
-          role={message.role}
-        />
-      ))}
+      {messages.map((message, index) => {
+        if (message.experimental_attachments) {
+          return (
+            <div
+              data-role="user"
+              className="flex max-w-[90%] rounded-xl px-3 py-2 text-sm self-end bg-primary text-secondary"
+            >
+              <FileIcon size={16} className="mr-1" />
+              {message.experimental_attachments[0].name}
+            </div>
+          );
+        } else {
+          return (
+            <MarkdownMessage
+              key={index}
+              content={message.content}
+              role={message.role}
+            />
+          );
+        }
+      })}
     </div>
   );
 
@@ -101,23 +120,27 @@ export function ChatForm() {
           {messageList}
         </div>
         <form
+          id="msgForm"
           onSubmit={handleSubmitWrapper}
           className="border-input bg-background focus-within:ring-ring/10 relative m-4 flex items-center rounded-[16px] border px-3 py-1.5 text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-0"
         >
           <AutoResizeTextarea
             onKeyDown={handleKeyDown}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={handleInputChange}
             value={input}
-            placeholder="Enter a message"
+            placeholder={"Enter a message or attach file"}
             className="placeholder:text-muted-foreground flex-1 bg-transparent focus:outline-none"
           />
-          <input
+
+          <Input
+            id="uploadFile"
+            ref={fileInputRef}
             type="file"
             accept=".pdf"
             onChange={handleFileChange}
-            ref={fileInputRef}
             className="hidden"
           />
+
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -129,19 +152,30 @@ export function ChatForm() {
                   fileInputRef.current?.click();
                 }}
               >
-                <FileIcon size={16} />
+                {files ? (
+                  <FileCheckIcon size={16} />
+                ) : (
+                  <PaperclipIcon size={16} />
+                )}
               </Button>
             </TooltipTrigger>
-            <TooltipContent sideOffset={12}>Upload PDF</TooltipContent>
+            <TooltipContent sideOffset={12}>
+              {files ? "Replace PDF" : "Attach PDF"}
+            </TooltipContent>
           </Tooltip>
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="sm" className="size-6 rounded-full">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="size-6 rounded-full"
+                disabled={!input && !files}
+              >
                 <ArrowUpIcon size={16} />
               </Button>
             </TooltipTrigger>
-            <TooltipContent sideOffset={12}>Send Message</TooltipContent>
+            <TooltipContent sideOffset={12}>Send</TooltipContent>
           </Tooltip>
         </form>
       </div>

@@ -1,21 +1,44 @@
 "use client";
 
-import { useFile } from "@/lib/file-context";
+import { useEffect, useState } from "react";
 
-export function PDFViewer({}) {
-  const { fileData } = useFile();
+type PDFViewerProps = {
+  dataUrl: string;
+};
 
-  if (!fileData) {
-    return "Loading...";
-  }
+export function PDFViewer({ dataUrl }: PDFViewerProps) {
+  const [objUrl, setObjUrl] = useState("");
+  const [isLoading, setLoading] = useState(true);
 
-  const url = URL.createObjectURL(fileData);
+  if (isLoading) return <p>Loading...</p>;
+  if (!objUrl) return <p>No data</p>;
+
+  useEffect(() => {
+    console.log("useEffect");
+    fetch(dataUrl)
+      .then((res) => {
+        console.log(res.blob());
+        return res.blob();
+      })
+      .then((blob) => {
+        console.log(URL.createObjectURL(blob));
+        return URL.createObjectURL(blob);
+      })
+      .then((url) => {
+        setObjUrl(url);
+        setLoading(false);
+      });
+  }, []);
 
   return (
     <div className="w-full h-full">
-      <object className="w-full h-full" data={url} type="application/pdf">
-        <embed src={url} type="application/pdf" />
-      </object>
+      {objUrl ? (
+        <object className="w-full h-full" data={objUrl} type="application/pdf">
+          <embed src={objUrl} type="application/pdf" />
+        </object>
+      ) : (
+        "Loading..."
+      )}
     </div>
   );
 }

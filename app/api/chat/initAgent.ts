@@ -26,16 +26,24 @@ export async function initAgent() {
       }),
     );
 
-    const tools = [
-      vectorStore.asRetriever().asTool({
-        name: "queryPDF",
-        schema: z.string().describe("Query string to search the PDF"),
-      }),
-      ...(await initAgentKit()),
-    ];
+    const retriever = vectorStore.asRetriever({
+      k: 10,
+      tags: ["pdf", "document"],
+      verbose: true,
+      metadata: { pdf_uploaded: true },
+    });
+    const msearchTool = retriever.asTool({
+      name: "doc_msearch",
+      description: "RAG-search vector store based on uploaded PDF file",
+      schema: z
+        .string()
+        .describe("RAG-search vector store based on uploaded PDF file"),
+    });
+
+    const tools = [msearchTool, ...(await initAgentKit())];
 
     console.log(
-      "Available tools:",
+      "Available agent tools:",
       tools.map((v) => v.name),
     );
 

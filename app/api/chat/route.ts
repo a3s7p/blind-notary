@@ -1,6 +1,4 @@
 import { LangChainAdapter, Message, CreateMessage } from "ai";
-import { OpenAIEmbeddings } from "@langchain/openai";
-import { MemoryVectorStore } from "langchain/vectorstores/memory";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import {
@@ -47,10 +45,12 @@ export async function POST(req: Request) {
         }
 
         // role is user
-        const msg = new HumanMessage(v.content, {
-          pdf_uploaded: true,
-        });
-        return msg;
+        return new HumanMessage(
+          v.experimental_attachments
+            ? v.content +
+              `<PDF UPLOADED: ${v.experimental_attachments[0].name}>`
+            : v.content,
+        );
       });
 
     console.log(
@@ -67,7 +67,12 @@ export async function POST(req: Request) {
           chunkSize: 500,
           chunkOverlap: 100,
         });
-        const splits = await splitter.splitDocuments(docs);
+        const splits = await splitter.splitDocuments(
+          docs.map((d) => ({
+            ...d,
+            metadata: { ...d.metadata, name: v.name },
+          })),
+        );
         await (await AGENT()).vectorStore.addDocuments(splits);
       }
     }
