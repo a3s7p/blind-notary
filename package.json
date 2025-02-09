@@ -17,6 +17,7 @@
     "@langchain/community": "^0.3.29",
     "@langchain/core": "^0.3.39",
     "@langchain/langgraph": "^0.2.45",
+    "@langchain/nomic": "^0.1.0",
     "@langchain/openai": "^0.4.2",
     "@langchain/textsplitters": "^0.1.0",
     "@radix-ui/react-accordion": "^1.2.2",
