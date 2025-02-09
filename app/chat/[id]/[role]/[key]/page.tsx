@@ -4,10 +4,14 @@ import { ChatForm } from "@/components/chat-form";
 export default async function Page({
   params,
 }: {
-  params: Promise<{ id: string; key: string }>;
+  params: Promise<{ id: string; role: string; key: string }>;
 }) {
   const { id, key } = await params;
   const hist = await getHistory(id);
+
+  if (!key) {
+    throw new Error("No key, no entry.");
+  }
 
   return (
     <>
