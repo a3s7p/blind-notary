@@ -22,6 +22,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import type React from "react";
 import { MarkdownMessage } from "@/app/markdownMessage";
 import { Input } from "./ui/input";
+import { appendObject } from "@/app/actions";
 
 type ChatFormProps = {
   chatId: string;
@@ -31,9 +32,19 @@ type ChatFormProps = {
 
 export function ChatForm(props: ChatFormProps) {
   const { messages, input, handleInputChange, error, handleSubmit } = useChat({
-    initialMessages: [], // TODO load history
+    initialMessages: props.messages,
     onToolCall({ toolCall }) {
       console.log("tool called on client", toolCall);
+    },
+    onFinish(message) {
+      setTimeout(
+        async () =>
+          await appendObject(
+            props.chatId,
+            message.id,
+            new TextEncoder().encode(JSON.stringify(message)),
+          ),
+      );
     },
     experimental_prepareRequestBody(options) {
       return { ...options, id: props.chatId, metadata: props };
@@ -80,7 +91,7 @@ export function ChatForm(props: ChatFormProps) {
     <div className="my-4 flex h-full flex-col gap-4">
       <MarkdownMessage
         role="assistant"
-        content="Welcome! I'm Blind Notary. How can I help you?"
+        content="Welcome! I'm **Blind Notary**. How can I help you?"
       />
 
       {messages.map((message, index) => {
@@ -121,7 +132,7 @@ export function ChatForm(props: ChatFormProps) {
     <TooltipProvider delayDuration={0}>
       <div className="flex h-full flex-col w-full md:w-3/4">
         <div className="flex-1 overflow-y-auto p-4">
-          <Alert variant="destructive" className="mb-4">
+          <Alert variant="destructive">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
               This AI assistant is not a substitute for professional legal
@@ -190,7 +201,7 @@ export function ChatForm(props: ChatFormProps) {
             <TooltipContent sideOffset={12}>Send</TooltipContent>
           </Tooltip>
         </form>
-        <div className="mx-4 flex justify-between items-center rounded-[16px] px-3 text-sm">
+        <div className="mx-4 flex justify-between items-center rounded-[16px] text-sm">
           <div className="flex gap-3">
             {suggestions.map((v) => (
               <Button
@@ -203,7 +214,7 @@ export function ChatForm(props: ChatFormProps) {
               </Button>
             ))}
           </div>
-          <div className="flex items-center text-neutral-500 gap-2 hover:text-neutral-200">
+          <div className="flex items-center text-neutral-500 gap-2 hover:text-neutral-200 border rounded-full px-3 py-1.5">
             Chat ID: <b>{props.chatId}</b>
             <ClipboardCopyIcon size={16} />
           </div>

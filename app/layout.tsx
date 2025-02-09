@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata = {
   title: "Blind Notary",
   description:
-    "Privacy-first AI document review, signing and chat application.",
+    "Privacy-first AI document review, signing and collaborative chat.",
 };
 
 export default function Layout({ children }: { children: ReactNode }) {

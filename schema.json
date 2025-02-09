@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Secret Document Blob",
+  "title": "Blind Notary Blob",
   "type": "array",
   "items": {
     "type": "object",
@@ -9,6 +9,23 @@
         "type": "string",
         "format": "uuid",
         "coerce": true
+      },
+      "object": {
+        "type": "object",
+        "properties": {
+          "$share": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "$share"
+        ]
+      },
+      "ts": {
+        "type": "integer"
+      },
+      "sz": {
+        "type": "integer"
       },
       "idx": {
         "type": "integer"
@@ -27,6 +44,9 @@
     },
     "required": [
       "_id",
+      "object",
+      "ts",
+      "sz",
       "idx",
       "data"
     ]
