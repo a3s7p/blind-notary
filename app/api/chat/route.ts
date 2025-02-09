@@ -18,7 +18,7 @@ const AGENT = (() => {
 
 export async function POST(req: Request) {
   try {
-    const { id, messages }: { id: string; messages: Message[] } =
+    const { id, messages }: { id: string; messages: Message[]; metadata: any } =
       await req.json();
 
     // this should only be slow the very first time

@@ -6,6 +6,9 @@ import { initModel } from "./initModel";
 import { initAgentKit } from "./initAgentKit";
 import { OpenAIEmbeddings } from "@langchain/openai";
 import { MemoryVectorStore } from "langchain/vectorstores/memory";
+import { DefaultProvider } from "@/app/ProviderConfig";
+import { newChat, newChatUrl } from "@/app/actions";
+import { DynamicStructuredTool } from "@langchain/core/tools";
 
 // File with the system prompt
 export const SYSTEM_PROMPT_FILE = "system_prompt.txt";
@@ -17,12 +20,14 @@ export const SYSTEM_PROMPT_FILE = "system_prompt.txt";
  */
 export async function initAgent() {
   try {
-    const llm = await initModel();
+    const cfg = DefaultProvider;
+
+    const llm = await initModel(cfg);
 
     const vectorStore = new MemoryVectorStore(
       new OpenAIEmbeddings({
-        // TODO replace
-        model: "text-embedding-3-large",
+        // TODO customize & localize
+        model: cfg.embedding,
       }),
     );
 
@@ -39,7 +44,20 @@ export async function initAgent() {
         .describe("RAG-search vector store based on uploaded PDF file"),
     });
 
-    const tools = [msearchTool, ...(await initAgentKit())];
+    const inviteTool = new DynamicStructuredTool({
+      name: "Invite",
+      description: "Generate invite link for a counterparty to the document",
+      schema: z.object({
+        role: z
+          .enum(["signatory", "reviewer"])
+          .describe(
+            "Whether the invited party should have read only (reviewer) or read & sign (signatory) access",
+          ),
+      }),
+      func: async ({ role }) => await newChatUrl(role),
+    });
+
+    const tools = [msearchTool, inviteTool, ...(await initAgentKit())];
     const checkpointSaver = new MemorySaver();
 
     const stateModifier = (() => {
