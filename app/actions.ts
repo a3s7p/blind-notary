@@ -32,9 +32,13 @@ function* chunks(arr: Uint8Array, n: number): Generator<Uint8Array, void> {
 // approximate so it doesn't go over 4K after b64 encoding
 const MAX_CHUNK_SIZE = 3064;
 
-// just generates new session and party key
+export async function newChatUrl(role: "author" | "signatory" | "reviewer") {
+  return `/chat/${randomUUID()}/${role}/${randomUUID()}`;
+}
+
+// just generates new session and party key in the app
 export async function newChat() {
-  redirect(`/chat/${randomUUID()}/${randomUUID()}`);
+  redirect(await newChatUrl("author"));
 }
 
 // obtain entire history for session/schema ID
