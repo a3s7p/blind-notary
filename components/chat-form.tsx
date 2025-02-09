@@ -78,6 +78,7 @@ export function ChatForm() {
         if (message.experimental_attachments) {
           return (
             <div
+              key={index}
               data-role="user"
               className="flex max-w-[90%] rounded-xl px-3 py-2 text-sm self-end bg-primary text-secondary"
             >

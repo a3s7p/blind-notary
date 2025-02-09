@@ -31,9 +31,11 @@ const CHUNK_SIZE = 3064;
 export const toVault: (
   name: string,
   data: Uint8Array,
-) => Result<string> = async (name, data) => {
+  schemaId?: string,
+) => Result<string> = async (name, data, schemaId) => {
   try {
-    const newSchemaId = (await ORG.createSchema(schema, name))[0].result.data;
+    const newSchemaId = (await ORG.createSchema(schema, name, schemaId))[0]
+      .result.data;
     ORG.setSchemaId(newSchemaId);
 
     await ORG.writeToNodes([

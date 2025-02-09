@@ -12,6 +12,7 @@ import {
 import { initAgent } from "./initAgent";
 import { validateEnvironment } from "./validateEnvironment";
 import { Messages } from "@langchain/langgraph";
+import { toVault } from "@/app/actions";
 
 // Right after imports and before any other code
 validateEnvironment();
@@ -59,9 +60,24 @@ export async function POST(req: Request) {
     );
 
     for (const m of messages) {
-      // sideload attachments
       for (const v of m.experimental_attachments || []) {
-        const loader = new PDFLoader(await (await fetch(v.url)).blob());
+        const docBlob = await (await fetch(v.url)).blob();
+
+        // upload to nilDB
+        const maybeVaultId = await toVault(
+          v.name || "noname.pdf",
+          await docBlob.bytes(),
+          crypto.randomUUID(),
+        );
+
+        if (maybeVaultId.ok) {
+          console.log(`in nilDB as ${maybeVaultId.value}`);
+        } else {
+          throw new Error(`nilDB upload failed: ${maybeVaultId.message}`);
+        }
+
+        // load into vector store
+        const loader = new PDFLoader(docBlob);
         const docs = await loader.load();
         const splitter = new RecursiveCharacterTextSplitter({
           chunkSize: 500,
@@ -70,7 +86,11 @@ export async function POST(req: Request) {
         const splits = await splitter.splitDocuments(
           docs.map((d) => ({
             ...d,
-            metadata: { ...d.metadata, name: v.name },
+            metadata: {
+              ...d.metadata,
+              name: v.name,
+              vaultId: maybeVaultId.value,
+            },
           })),
         );
         await (await AGENT()).vectorStore.addDocuments(splits);
@@ -82,8 +102,7 @@ export async function POST(req: Request) {
     ).agent.stream(
       { messages: lcMessages },
       {
-        // TODO generate unique UUID
-        configurable: { thread_id: "Blind Notary Demo Chat" },
+        configurable: { thread_id: crypto.randomUUID() },
         streamMode: "messages",
       },
     );

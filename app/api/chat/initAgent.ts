@@ -29,7 +29,6 @@ export async function initAgent() {
     const retriever = vectorStore.asRetriever({
       k: 10,
       tags: ["pdf", "document"],
-      verbose: true,
       metadata: { pdf_uploaded: true },
     });
     const msearchTool = retriever.asTool({
