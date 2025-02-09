@@ -1,6 +1,6 @@
 "use client";
 
-import { useChat } from "ai/react";
+import { Message, useChat } from "ai/react";
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowUpIcon,
@@ -8,7 +8,6 @@ import {
   FileCheckIcon,
   PaperclipIcon,
   FileIcon,
-  ClipboardIcon,
   ClipboardCopyIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -27,6 +26,7 @@ import { Input } from "./ui/input";
 type ChatFormProps = {
   chatId: string;
   chatKey: string;
+  messages: Message[];
 };
 
 export function ChatForm(props: ChatFormProps) {
@@ -77,10 +77,10 @@ export function ChatForm(props: ChatFormProps) {
   };
 
   const messageList = (
-    <div className="my-4 flex h-fit min-h-full flex-col gap-4">
+    <div className="my-4 flex h-full flex-col gap-4">
       <MarkdownMessage
         role="assistant"
-        content="Welcome! I'm Blind Notary. What can I help you with?"
+        content="Welcome! I'm Blind Notary. How can I help you?"
       />
 
       {messages.map((message, index) => {
@@ -114,6 +114,8 @@ export function ChatForm(props: ChatFormProps) {
       console.error("Chat error:", error);
     }
   }, [error]);
+
+  const suggestions = ["Lorem", "ipsum", "dolorem"];
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -190,15 +192,16 @@ export function ChatForm(props: ChatFormProps) {
         </form>
         <div className="mx-4 flex justify-between items-center rounded-[16px] px-3 text-sm">
           <div className="flex gap-3">
-            <Button variant={"outline"} size="sm" className="rounded-full">
-              Lorem
-            </Button>
-            <Button variant={"outline"} size="sm" className="rounded-full">
-              ipsum
-            </Button>
-            <Button variant={"outline"} size="sm" className="rounded-full">
-              dolorem
-            </Button>
+            {suggestions.map((v) => (
+              <Button
+                key={v}
+                variant={"outline"}
+                size="sm"
+                className="rounded-full"
+              >
+                {v}
+              </Button>
+            ))}
           </div>
           <div className="flex items-center text-neutral-500 gap-2 hover:text-neutral-200">
             Chat ID: <b>{props.chatId}</b>
