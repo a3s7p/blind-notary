@@ -1,4 +1,8 @@
 import { LangChainAdapter, Message, CreateMessage } from "ai";
+import { OpenAIEmbeddings } from "@langchain/openai";
+import { MemoryVectorStore } from "langchain/vectorstores/memory";
+import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
+import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import {
   AIMessage,
   BaseMessageChunk,
@@ -33,24 +37,47 @@ export async function POST(req: Request) {
 
     const lcMessages: Messages = messages
       .filter((v: Message) => v.role == "user" || v.role == "assistant")
-      .map((v: Message) =>
-        v.role == "user"
-          ? new HumanMessage(v.content)
-          : v.role == "assistant"
-            ? new AIMessage(v.content)
-            : new ChatMessage(v.content, v.role),
-      );
+      .map((v: Message) => {
+        if (v.role == "assistant") {
+          return new AIMessage(v.content);
+        }
+
+        if (v.role != "user") {
+          return new ChatMessage(v.content, v.role);
+        }
+
+        // role is user
+        const msg = new HumanMessage(v.content, {
+          pdf_uploaded: true,
+        });
+        return msg;
+      });
 
     console.log(
       "Converted to LC messages:",
       JSON.stringify(lcMessages, null, 2),
     );
 
+    for (const m of messages) {
+      // sideload attachments
+      for (const v of m.experimental_attachments || []) {
+        const loader = new PDFLoader(await (await fetch(v.url)).blob());
+        const docs = await loader.load();
+        const splitter = new RecursiveCharacterTextSplitter({
+          chunkSize: 500,
+          chunkOverlap: 100,
+        });
+        const splits = await splitter.splitDocuments(docs);
+        await (await AGENT()).vectorStore.addDocuments(splits);
+      }
+    }
+
     const stream = await (
       await AGENT()
-    ).stream(
+    ).agent.stream(
       { messages: lcMessages },
       {
+        // TODO generate unique UUID
         configurable: { thread_id: "Blind Notary Demo Chat" },
         streamMode: "messages",
       },

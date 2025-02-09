@@ -37,10 +37,5 @@ export async function initAgentKit() {
     ],
   });
 
-  const tools = await getLangChainTools(agentKit);
-  console.log(
-    "Available tools:",
-    tools.map((v) => v.name),
-  );
-  return tools;
+  return await getLangChainTools(agentKit);
 }

@@ -124,7 +124,10 @@ export function ChatForm() {
                 variant="ghost"
                 size="sm"
                 className="size-6 rounded-full mr-1"
-                onClick={() => fileInputRef.current?.click()}
+                onClick={(e) => {
+                  e.preventDefault();
+                  fileInputRef.current?.click();
+                }}
               >
                 <FileIcon size={16} />
               </Button>

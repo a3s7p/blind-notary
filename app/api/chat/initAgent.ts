@@ -1,8 +1,11 @@
 import { MemorySaver } from "@langchain/langgraph";
+import { z } from "zod";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import * as fs from "fs";
 import { initModel } from "./initModel";
 import { initAgentKit } from "./initAgentKit";
+import { OpenAIEmbeddings } from "@langchain/openai";
+import { MemoryVectorStore } from "langchain/vectorstores/memory";
 
 // File with the system prompt
 export const SYSTEM_PROMPT_FILE = "system_prompt.txt";
@@ -14,21 +17,46 @@ export const SYSTEM_PROMPT_FILE = "system_prompt.txt";
  */
 export async function initAgent() {
   try {
-    return createReactAgent({
-      llm: await initModel(),
-      tools: await initAgentKit(),
-      checkpointSaver: new MemorySaver(),
-      stateModifier: (() => {
-        if (fs.existsSync(SYSTEM_PROMPT_FILE)) {
-          try {
-            return fs.readFileSync(SYSTEM_PROMPT_FILE, "utf8");
-          } catch (error) {
-            console.warn("Could not read system prompt:", error);
-            // Continue without system prompt but warn
-          }
+    const llm = await initModel();
+
+    const vectorStore = new MemoryVectorStore(
+      new OpenAIEmbeddings({
+        // TODO replace
+        model: "text-embedding-3-large",
+      }),
+    );
+
+    const tools = [
+      vectorStore.asRetriever().asTool({
+        name: "queryPDF",
+        schema: z.string().describe("Query string to search the PDF"),
+      }),
+      ...(await initAgentKit()),
+    ];
+
+    console.log(
+      "Available tools:",
+      tools.map((v) => v.name),
+    );
+
+    const checkpointSaver = new MemorySaver();
+
+    const stateModifier = (() => {
+      if (fs.existsSync(SYSTEM_PROMPT_FILE)) {
+        try {
+          return fs.readFileSync(SYSTEM_PROMPT_FILE, "utf8");
+        } catch (error) {
+          console.warn("Could not read system prompt:", error);
+          // Continue without system prompt but warn
         }
-      })(),
-    });
+      }
+    })();
+
+    return {
+      agent: createReactAgent({ llm, tools, checkpointSaver, stateModifier }),
+      // expose VS to add documents from API route
+      vectorStore,
+    };
   } catch (error) {
     console.error("Failed to initialize agent:", error);
     throw error; // Re-throw to be handled by caller
