@@ -99,28 +99,14 @@ export async function getHistory(schemaId: string): Promise<Message[]> {
 
 // reconstruct original object
 function assembleChunks(chunks: Chunk[]) {
-  const total = chunks.reduce((acc, v) => acc + v.sz, 0);
   const buf = Buffer.alloc(chunks.reduce((acc, v) => acc + v.sz, 0));
 
   chunks
     .sort((a, b) => a.idx - b.idx)
     .reduce((acc, v) => {
       buf.fill(v.data, acc, acc + v.sz, "base64url");
-      console.log(
-        "unpacking",
-        new TextDecoder().decode(Buffer.from(v.data, "base64url")),
-        v.data,
-        "from",
-        acc,
-        "to",
-        acc + v.sz,
-        "out of",
-        total,
-      );
       return acc + v.sz;
     }, 0);
-
-  console.log(new TextDecoder().decode(buf));
 
   return buf;
 }
