@@ -1,9 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-
 import { DoorClosedIcon, DoorOpenIcon } from "lucide-react";
-
 import { useState } from "react";
 import { newChat } from "./actions";
 

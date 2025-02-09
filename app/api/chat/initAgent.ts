@@ -40,12 +40,6 @@ export async function initAgent() {
     });
 
     const tools = [msearchTool, ...(await initAgentKit())];
-
-    console.log(
-      "Available agent tools:",
-      tools.map((v) => v.name),
-    );
-
     const checkpointSaver = new MemorySaver();
 
     const stateModifier = (() => {

@@ -25,14 +25,13 @@ const AGENT = (() => {
 
 export async function POST(req: Request) {
   try {
-    console.log("API chat route called");
-
-    const { messages }: { messages: Message[] } = await req.json();
-
-    console.log(
-      "Received messages from client:",
-      JSON.stringify(messages, null, 2),
-    );
+    const {
+      id,
+      messages,
+      metadata,
+    }: { id: string; messages: Message[]; metadata: any } = await req.json();
+    const { chatId, chatKey } = metadata;
+    console.log(id, chatId, chatKey);
 
     const lcMessages: Messages = messages
       .filter((v: Message) => v.role == "user" || v.role == "assistant")
@@ -54,11 +53,6 @@ export async function POST(req: Request) {
         );
       });
 
-    console.log(
-      "Converted to LC messages:",
-      JSON.stringify(lcMessages, null, 2),
-    );
-
     for (const m of messages) {
       for (const v of m.experimental_attachments || []) {
         const docBlob = await (await fetch(v.url)).blob();
@@ -67,7 +61,7 @@ export async function POST(req: Request) {
         const maybeVaultId = await toVault(
           v.name || "noname.pdf",
           await docBlob.bytes(),
-          crypto.randomUUID(),
+          id,
         );
 
         if (maybeVaultId.ok) {
@@ -102,7 +96,7 @@ export async function POST(req: Request) {
     ).agent.stream(
       { messages: lcMessages },
       {
-        configurable: { thread_id: crypto.randomUUID() },
+        configurable: { thread_id: id },
         streamMode: "messages",
       },
     );

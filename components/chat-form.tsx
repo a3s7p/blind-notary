@@ -8,6 +8,8 @@ import {
   FileCheckIcon,
   PaperclipIcon,
   FileIcon,
+  ClipboardIcon,
+  ClipboardCopyIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,11 +24,19 @@ import type React from "react";
 import { MarkdownMessage } from "@/app/markdownMessage";
 import { Input } from "./ui/input";
 
-export function ChatForm() {
+type ChatFormProps = {
+  chatId: string;
+  chatKey: string;
+};
+
+export function ChatForm(props: ChatFormProps) {
   const { messages, input, handleInputChange, error, handleSubmit } = useChat({
     initialMessages: [], // TODO load history
     onToolCall({ toolCall }) {
       console.log("tool called on client", toolCall);
+    },
+    experimental_prepareRequestBody(options) {
+      return { ...options, id: props.chatId, metadata: props };
     },
   });
 
@@ -178,6 +188,23 @@ export function ChatForm() {
             <TooltipContent sideOffset={12}>Send</TooltipContent>
           </Tooltip>
         </form>
+        <div className="mx-4 flex justify-between items-center rounded-[16px] px-3 text-sm">
+          <div className="flex gap-3">
+            <Button variant={"outline"} size="sm" className="rounded-full">
+              Lorem
+            </Button>
+            <Button variant={"outline"} size="sm" className="rounded-full">
+              ipsum
+            </Button>
+            <Button variant={"outline"} size="sm" className="rounded-full">
+              dolorem
+            </Button>
+          </div>
+          <div className="flex items-center text-neutral-500 gap-2 hover:text-neutral-200">
+            Chat ID: <b>{props.chatId}</b>
+            <ClipboardCopyIcon size={16} />
+          </div>
+        </div>
       </div>
     </TooltipProvider>
   );
