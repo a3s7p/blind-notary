@@ -92,6 +92,7 @@ export function ChatForm(props: ChatFormProps) {
       <MarkdownMessage
         role="assistant"
         content="Welcome! I'm **Blind Notary**. How can I help you?"
+        hash={props.chatId}
       />
 
       {messages.map((message, index) => {
@@ -112,6 +113,7 @@ export function ChatForm(props: ChatFormProps) {
               key={index}
               content={message.content}
               role={message.role}
+              hash={props.chatId}
             />
           );
         }
@@ -148,6 +150,7 @@ export function ChatForm(props: ChatFormProps) {
   ];
 
   const [isChatIdCopied, setChatIdCopied] = useState(false);
+
   useEffect(() => {
     if (isChatIdCopied) {
       setTimeout(() => setChatIdCopied(false), 2000);

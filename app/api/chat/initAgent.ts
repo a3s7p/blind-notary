@@ -36,6 +36,7 @@ export async function initAgent() {
       tags: ["pdf", "document"],
       metadata: { pdf_uploaded: true },
     });
+
     const msearchTool = retriever.asTool({
       name: "doc_msearch",
       description: "RAG-search vector store based on uploaded PDF file",
@@ -63,7 +64,8 @@ export async function initAgent() {
       func: async ({ chatId, role }) => await newExistingChatUrl(chatId, role),
     });
 
-    const tools = [msearchTool, inviteTool, ...(await initAgentKit())];
+    // const tools = [msearchTool, inviteTool, ...(await initAgentKit())];
+    const tools = [msearchTool, inviteTool];
     const checkpointSaver = new MemorySaver();
 
     const stateModifier = (() => {
