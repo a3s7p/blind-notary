@@ -88,6 +88,8 @@ export function ChatForm(props: ChatFormProps) {
     }
   };
 
+  const lastMessageHash = props.chatId;
+
   const messageList = (
     <div className="my-4 flex h-full flex-col gap-4">
       <MarkdownMessage
@@ -156,7 +158,7 @@ export function ChatForm(props: ChatFormProps) {
       icon: <SignatureIcon size={16} />,
       name: "Sign",
       desc: "Provide your signature on this session",
-      send: "_<Sign session>_",
+      send: `_<SIGN: CHAT ID "${props.chatId}"; PARTY ID "${props.chatKey}"; LAST MESSAGE HASH "${lastMessageHash}">_`,
     },
     {
       icon: <StampIcon size={16} />,

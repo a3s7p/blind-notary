@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import * as fs from "fs";
 import { initModel } from "./initModel";
+import crypto from "crypto";
 import { initAgentKit } from "./initAgentKit";
 import { OpenAIEmbeddings } from "@langchain/openai";
 import { MemoryVectorStore } from "langchain/vectorstores/memory";
@@ -64,8 +65,26 @@ export async function initAgent() {
       func: async ({ chatId, role }) => await newExistingChatUrl(chatId, role),
     });
 
+    const signTool = new DynamicStructuredTool({
+      name: "Sign",
+      description: "Sign session",
+      schema: z.object({
+        signMessage: z
+          .string()
+          .describe("Content of the message which triggers this tool call"),
+      }),
+      func: async ({ signMessage }) => {
+        const signHash = crypto
+          .createHash("sha1")
+          .update(signMessage)
+          .digest("hex");
+
+        return `DIGITAL SIGNATURE HASH: ${signHash}`;
+      },
+    });
+
     // const tools = [msearchTool, inviteTool, ...(await initAgentKit())];
-    const tools = [msearchTool, inviteTool];
+    const tools = [msearchTool, inviteTool, signTool];
     const checkpointSaver = new MemorySaver();
 
     const stateModifier = (() => {
