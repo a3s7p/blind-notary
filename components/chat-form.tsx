@@ -14,6 +14,7 @@ import {
   LinkIcon,
   CheckIcon,
 } from "lucide-react";
+import crypto from "crypto";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -95,29 +96,45 @@ export function ChatForm(props: ChatFormProps) {
         hash={props.chatId}
       />
 
-      {messages.map((message, index) => {
-        if (message.experimental_attachments) {
-          return (
-            <div
-              key={index}
-              data-role="user"
-              className="flex max-w-[90%] rounded-xl px-3 py-2 text-sm self-end bg-primary text-secondary"
-            >
-              <FileIcon size={16} className="mr-1" />
-              {message.experimental_attachments[0].name}
-            </div>
-          );
-        } else {
-          return (
-            <MarkdownMessage
-              key={index}
-              content={message.content}
-              role={message.role}
-              hash={props.chatId}
-            />
-          );
-        }
-      })}
+      {messages.reduce<React.ReactNode[]>((acc, message, index) => {
+        const previousHash =
+          index > 0
+            ? crypto
+                .createHash("sha1")
+                .update(messages[index - 1].content)
+                .digest("hex")
+            : props.chatId;
+
+        const currentHash = crypto
+          .createHash("sha1")
+          .update(message.content)
+          .digest("hex");
+
+        const totalHash = crypto
+          .createHash("sha1")
+          .update(previousHash + currentHash)
+          .digest("hex");
+
+        const element = message.experimental_attachments ? (
+          <div
+            key={index}
+            data-role="user"
+            className="flex max-w-[90%] rounded-xl px-3 py-2 text-sm self-end bg-primary text-secondary"
+          >
+            <FileIcon size={16} className="mr-1" />
+            {message.experimental_attachments[0].name}
+          </div>
+        ) : (
+          <MarkdownMessage
+            key={index}
+            content={message.content}
+            role={message.role}
+            hash={totalHash}
+          />
+        );
+
+        return [...acc, element];
+      }, [])}
     </div>
   );
 
