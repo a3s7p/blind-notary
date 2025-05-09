@@ -1,8 +1,4 @@
 import { CdpWalletProvider } from "@coinbase/agentkit";
-import * as fs from "fs";
-
-// Configure a file to persist the agent's CDP MPC Wallet Data
-export const WALLET_DATA_FILE = "wallet_data.txt";
 
 /**
  * Initialize a wallet with CDP Wallet Provider
@@ -18,23 +14,18 @@ export async function initWallet() {
       "\n",
     ),
     cdpWalletData: (() => {
-      if (fs.existsSync(WALLET_DATA_FILE)) {
-        try {
-          return fs.readFileSync(WALLET_DATA_FILE, "utf8");
-        } catch (error) {
-          // Continue without wallet data but warn
-          console.warn("Could not read wallet data:", error);
-        }
+      const walletData = process.env["CDP_WALLET_DATA"];
+
+      if (walletData) {
+        return walletData;
+      } else {
+        // Continue without wallet data but warn
+        console.warn("Could not read wallet data:");
       }
     })(),
     networkId: process.env.NETWORK_ID || "base-sepolia",
   };
 
   const walletProvider = await CdpWalletProvider.configureWithWallet(config);
-
-  // Persist wallet data
-  const exportedWallet = await walletProvider.exportWallet();
-  fs.writeFileSync(WALLET_DATA_FILE, JSON.stringify(exportedWallet));
-
   return walletProvider;
 }
